@@ -9,6 +9,7 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingTop="16dp"
+    android:background="@drawable/pokemon_gradient"
     tools:context=".MainActivity">
 
     <androidx.recyclerview.widget.RecyclerView
