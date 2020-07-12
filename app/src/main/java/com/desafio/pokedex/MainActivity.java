@@ -1,9 +1,13 @@
 package com.desafio.pokedex;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.LinearLayout;
 
 import com.desafio.pokedex.models.Pokemon;
 import com.desafio.pokedex.models.PokemonResponse;
@@ -21,11 +25,21 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "POKEDEX";
     private Retrofit retrofit;
+    private RecyclerView recyclerView;
+    private PokemonListAdapter PokemonListAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        recyclerView = findViewById(R.id.recyclerView);
+        PokemonListAdapter = new PokemonListAdapter();
+        recyclerView.setAdapter(PokemonListAdapter);
+        recyclerView.setHasFixedSize(true);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
+        recyclerView.setLayoutManager(layoutManager);
 
         retrofit = new Retrofit.Builder()
                 .baseUrl("https://pokeapi.co/api/v2/")
@@ -43,13 +57,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<PokemonResponse> call, Response<PokemonResponse> response) {
                 if (response.isSuccessful()) {
+
                     PokemonResponse pokemonResponse = response.body();
                    ArrayList<Pokemon> pokemonList = pokemonResponse.getResults();
 
-                   for (int i = 0; i < pokemonList.size(); i++) {
-                       Pokemon p = pokemonList.get(i);
-                       Log.i(TAG, " Pokemon: " + p.getName());
-                   }
+                   PokemonListAdapter.addPokemonList(pokemonList);
+
+//                   for (int i = 0; i < pokemonList.size(); i++) {
+//                       Pokemon p = pokemonList.get(i);
+//                       Log.i(TAG, " Pokemon: " + p.getName());
+//                   }
                 }
                 else {
                     Log.e(TAG, " onResponse: " + response.errorBody());

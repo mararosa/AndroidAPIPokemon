@@ -13,6 +13,10 @@ import com.desafio.pokedex.models.Pokemon;
 
 import java.util.ArrayList;
 
+/**
+ * Created by Edimara Rosa on 07/12/2020.
+ */
+
 public class PokemonListAdapter extends RecyclerView.Adapter<PokemonListAdapter.ViewHolder> {
 
     private ArrayList<Pokemon> dataset;
@@ -37,6 +41,11 @@ public class PokemonListAdapter extends RecyclerView.Adapter<PokemonListAdapter.
     @Override
     public int getItemCount() {
         return dataset.size();
+    }
+
+    public void addPokemonList(ArrayList<Pokemon> pokemonList) {
+        dataset.addAll(pokemonList);
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
