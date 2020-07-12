@@ -4,6 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import com.desafio.pokedex.models.PokemonResponse;
+import com.desafio.pokedex.pokeapi.PokeapiService;
+
+import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -25,6 +29,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getData() {
+        PokeapiService service = retrofit.create(PokeapiService.class);
+        Call<PokemonResponse> pokemonResponseCall = service.getListPokemon();
+
+
+
 
     }
 }
