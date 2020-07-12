@@ -1,13 +1,12 @@
 package com.desafio.pokedex;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.LinearLayout;
 
 import com.desafio.pokedex.models.Pokemon;
 import com.desafio.pokedex.models.PokemonResponse;
@@ -24,9 +23,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "POKEDEX";
+
     private Retrofit retrofit;
+
     private RecyclerView recyclerView;
     private PokemonListAdapter PokemonListAdapter;
+
+    private int offset;
+
+    private boolean canDownloadMore20Pokemons;
 
 
     @Override
@@ -38,24 +43,49 @@ public class MainActivity extends AppCompatActivity {
         PokemonListAdapter = new PokemonListAdapter(this);
         recyclerView.setAdapter(PokemonListAdapter);
         recyclerView.setHasFixedSize(true);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
+        final GridLayoutManager layoutManager = new GridLayoutManager(this, 3);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0) {
+                    int visibleItemCount = layoutManager.getChildCount();
+                    int totalItemCount = layoutManager.getItemCount();
+                    int pastVisibleItems = layoutManager.findFirstCompletelyVisibleItemPosition();
+
+                    if (canDownloadMore20Pokemons) {
+                        if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                            Log.i(TAG, " It is the end.");
+
+                            canDownloadMore20Pokemons = false;
+                            offset += 20;
+                            getData(offset);
+                        }
+                    }
+                }
+            }
+        });
 
         retrofit = new Retrofit.Builder()
                 .baseUrl("https://pokeapi.co/api/v2/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        getData();
+        canDownloadMore20Pokemons = true;
+        offset = 0;
+        getData(offset);
     }
 
-    private void getData() {
+    private void getData(int offset) {
         PokeapiService service = retrofit.create(PokeapiService.class);
-        Call<PokemonResponse> pokemonResponseCall = service.getListPokemon();
+        Call<PokemonResponse> pokemonResponseCall = service.getListPokemon(20, offset);
 
         pokemonResponseCall.enqueue(new Callback<PokemonResponse>() {
             @Override
             public void onResponse(Call<PokemonResponse> call, Response<PokemonResponse> response) {
+                canDownloadMore20Pokemons = true;
                 if (response.isSuccessful()) {
 
                     PokemonResponse pokemonResponse = response.body();
@@ -75,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<PokemonResponse> call, Throwable t) {
+                canDownloadMore20Pokemons = true;
                 Log.e(TAG, " onFailure: " + t.getMessage());
             }
         });
