@@ -8,8 +8,8 @@
         android:id="@+id/photoImagemView"
         android:layout_width="96dp"
         android:layout_height="96dp"
-        android:background="@color/colorAccent"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center_horizontal"
+        />
 
     <TextView
         android:id="@+id/nameTextView"
