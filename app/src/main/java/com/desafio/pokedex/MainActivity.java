@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private int offset;
 
-    private boolean canDownloadMore20Pokemons;
+    private boolean canLoading;
 
 
     @Override
@@ -55,11 +55,11 @@ public class MainActivity extends AppCompatActivity {
                     int totalItemCount = layoutManager.getItemCount();
                     int pastVisibleItems = layoutManager.findFirstCompletelyVisibleItemPosition();
 
-                    if (canDownloadMore20Pokemons) {
+                    if (canLoading) {
                         if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                            Log.i(TAG, " It is the end.");
+                            Log.i(TAG, " We arrive at the end of 20 pokemons.");
 
-                            canDownloadMore20Pokemons = false;
+                            canLoading = false; //stop loading so the app won't running multiple times the same line
                             offset += 20;
                             getData(offset);
                         }
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        canDownloadMore20Pokemons = true;
+        canLoading = true;
         offset = 0;
         getData(offset);
     }
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         pokemonResponseCall.enqueue(new Callback<PokemonResponse>() {
             @Override
             public void onResponse(Call<PokemonResponse> call, Response<PokemonResponse> response) {
-                canDownloadMore20Pokemons = true;
+                canLoading = true;
                 if (response.isSuccessful()) {
 
                     PokemonResponse pokemonResponse = response.body();
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<PokemonResponse> call, Throwable t) {
-                canDownloadMore20Pokemons = true;
+                canLoading = true;
                 Log.e(TAG, " onFailure: " + t.getMessage());
             }
         });
